@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>The Sun - News Portal</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <!-- Bootstrap 4 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    :root {
+      --red: #e8272a;
+      --dark: #1a1a2e;
+      --grey-light: #f5f5f5;
+      --grey-mid: #dedede;
+      --text-muted: #888;
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #fff; color: #222; margin: 0; }
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: var(--red); }
+    img { max-width: 100%; display: block; }
+
+    /* ── TOP BAR ── */
+    #top-bar {
+      background: var(--dark);
+      color: #ccc;
+      font-size: 12px;
+      padding: 6px 0;
+    }
+    #top-bar .top-date { color: #aaa; }
+    #top-bar .top-nav { list-style: none; display: inline-flex; gap: 14px; margin: 0; padding: 0; }
+    #top-bar .top-nav a { color: #ccc; }
+    #top-bar .top-nav a:hover { color: #fff; }
+    #top-bar .top-social a { color: #aaa; margin-left: 10px; font-size: 13px; }
+    #top-bar .top-social a:hover { color: var(--red); }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--grey-mid);
+    }
+    .site-logo { font-size: 32px; font-weight: 900; color: var(--red); letter-spacing: -1px; }
+    .site-logo span { color: var(--dark); }
+    .header-tagline { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── NAV ── */
+    .main-nav {
+      background: var(--dark);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .nav-tabs-list {
+      list-style: none;
+      margin: 0; padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+    .nav-tabs-list li a {
+      display: block;
+      color: #ccc;
+      font-size: 13px;
+      font-family: sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 13px 18px;
+      transition: background .2s, color .2s;
+    }
+    .nav-tabs-list li a:hover,
+    .nav-tabs-list li a.active {
+      background: var(--red);
+      color: #fff;
+    }
+    .nav-tabs-list li a .badge-count {
+      background: var(--red);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 10px;
+      padding: 1px 5px;
+      margin-left: 4px;
+    }
+    .nav-tabs-list li a.active .badge-count { background: #fff; color: var(--red); }
+
+    /* ── LOADING / ERROR ── */
+    .loader-wrap {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 200px; flex-direction: column; color: var(--text-muted);
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--grey-mid);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-left: 4px solid var(--red);
+      padding-left: 12px;
+      margin-bottom: 20px;
+      margin-top: 30px;
+    }
+
+    /* ── HERO POST ── */
+    .hero-post { position: relative; overflow: hidden; border-radius: 4px; }
+    .hero-post img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-post .hero-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,.85));
+      padding: 30px 20px 20px;
+    }
+    .hero-post .cat-badge {
+      display: inline-block;
+      background: var(--red); color: #fff;
+      font-size: 10px; font-family: sans-serif;
+      font-weight: 700; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 2px;
+      margin-bottom: 8px;
+    }
+    .hero-post h2 { color: #fff; font-size: 22px; margin: 0; line-height: 1.3; }
+    .hero-post .meta { color: #aaa; font-size: 12px; font-family: sans-serif; margin-top: 6px; }
+
+    /* ── POST CARD ── */
+    .post-card { margin-bottom: 24px; }
+    .post-card .thumb {
+      overflow: hidden; border-radius: 3px;
+      position: relative; background: var(--grey-light);
+    }
+    .post-card .thumb img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      transition: transform .35s ease;
+    }
+    .post-card:hover .thumb img { transform: scale(1.04); }
+    .post-card .thumb .no-img {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--grey-mid); font-size: 38px;
+    }
+    .post-card .cat-label {
+      display: inline-block;
+      background: var(--red); color: #fff;
+      font-size: 10px; font-family: sans-serif;
+      font-weight: 700; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 2px;
+      margin: 8px 0 5px;
+    }
+    .post-card h3 {
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 0;
+      font-weight: 700;
+    }
+    .post-card h3 a:hover { color: var(--red); }
+    .post-card .meta {
+      font-size: 11px; color: var(--text-muted);
+      font-family: sans-serif; margin-top: 5px;
+    }
+
+    /* ── HORIZONTAL LIST POST ── */
+    .list-post { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+    .list-post .thumb { flex: 0 0 80px; }
+    .list-post .thumb img { width: 80px; height: 60px; object-fit: cover; border-radius: 3px; }
+    .list-post .info h4 { font-size: 13px; margin: 0; line-height: 1.4; font-weight: 700; }
+    .list-post .info h4 a:hover { color: var(--red); }
+    .list-post .info .meta { font-size: 11px; color: var(--text-muted); font-family: sans-serif; }
+
+    /* ── SIDEBAR ── */
+    .sidebar-widget { margin-bottom: 30px; }
+    .widget-title {
+      font-size: 14px; font-family: sans-serif; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 2px solid var(--red); padding-bottom: 8px; margin-bottom: 14px;
+    }
+
+    /* ── PAGINATION ── */
+    .load-more-btn {
+      display: block; width: 100%;
+      background: var(--dark); color: #fff;
+      border: none; padding: 12px;
+      font-family: sans-serif; font-size: 13px;
+      font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; cursor: pointer;
+      border-radius: 3px; transition: background .2s;
+      margin-top: 10px;
+    }
+    .load-more-btn:hover { background: var(--red); }
+    .load-more-btn:disabled { opacity: .5; cursor: default; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark); color: #bbb;
+      padding: 40px 0 20px;
+      margin-top: 50px;
+    }
+    footer .footer-logo { font-size: 24px; font-weight: 900; color: var(--red); margin-bottom: 10px; }
+    footer p { font-size: 13px; }
+    footer .footer-title { color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+    .copyright-bar { background: #111; color: #666; font-size: 12px; font-family: sans-serif; text-align: center; padding: 10px; }
+
+    /* ── BREAKING TICKER ── */
+    .breaking-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--grey-mid);
+      display: flex; align-items: center;
+      overflow: hidden;
+      font-family: sans-serif;
+      font-size: 13px;
+    }
+    .breaking-label {
+      background: var(--red); color: #fff;
+      padding: 8px 14px; flex-shrink: 0;
+      font-weight: 700; text-transform: uppercase;
+      font-size: 11px; letter-spacing: 1px;
+    }
+    .ticker-wrap { overflow: hidden; flex: 1; }
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 40s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-track span { padding: 8px 40px 8px 0; }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    @media (max-width: 767px) {
+      .hero-post img { height: 220px; }
+      .hero-post h2 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div id="top-bar">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <span class="top-date"><i class="fa fa-calendar-o mr-1"></i><span id="today-date"></span></span>
+        <ul class="top-nav d-inline-flex ml-3">
+          <li><a href="https://thesun.my/about" target="_blank">About</a></li>
+          <li><a href="https://thesun.my/advertise" target="_blank">Advertise</a></li>
+          <li><a href="https://thesun.my/contact" target="_blank">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 text-right top-social">
+        <a href="#"><i class="fa fa-facebook"></i></a>
+        <a href="#"><i class="fa fa-twitter"></i></a>
+        <a href="#"><i class="fa fa-instagram"></i></a>
+        <a href="#"><i class="fa fa-rss"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-4">
+        <div class="site-logo">the<span>sun</span></div>
+        <div class="header-tagline">Malaysia's Award-Winning News</div>
+      </div>
+      <div class="col-md-8 text-right">
+        <div class="input-group" style="max-width:320px;margin-left:auto;">
+          <input type="text" id="search-input" class="form-control form-control-sm" placeholder="Search news…">
+          <div class="input-group-append">
+            <button class="btn btn-sm btn-danger" onclick="doSearch()"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ BREAKING NEWS TICKER ═══ -->
+<div class="breaking-bar">
+  <div class="breaking-label">Breaking</div>
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="ticker-track">
+      <span id="ticker-loading">Loading latest headlines…</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav class="main-nav">
+  <div class="container">
+    <ul class="nav-tabs-list" id="cat-nav">
+      <li><a href="#" class="active" data-cat-id="all" onclick="loadCategory(event,'all','Latest News')">
+        <i class="fa fa-home mr-1"></i> Home
+      </a></li>
+      <!-- categories injected by JS -->
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main class="container" style="margin-top:30px;">
+  <div class="row">
+
+    <!-- LEFT: MAIN FEED -->
+    <div class="col-lg-8">
+
+      <!-- HERO -->
+      <div id="hero-area">
+        <div class="loader-wrap"><div class="spinner"></div><span>Loading top story…</span></div>
+      </div>
+
+      <!-- SECTION TITLE -->
+      <div class="section-title" id="section-label">Latest News</div>
+
+      <!-- POST GRID -->
+      <div class="row" id="posts-grid">
+        <div class="col-12 loader-wrap"><div class="spinner"></div><span>Fetching posts…</span></div>
+      </div>
+
+      <button class="load-more-btn" id="load-more-btn" style="display:none;" onclick="loadMore()">
+        <i class="fa fa-refresh mr-2"></i> Load More
+      </button>
+
+    </div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <div class="col-lg-4">
+
+      <!-- MOST READ -->
+      <div class="sidebar-widget">
+        <div class="widget-title">Most Read</div>
+        <div id="most-read">
+          <div class="loader-wrap" style="min-height:100px;"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES LIST -->
+      <div class="sidebar-widget">
+        <div class="widget-title">Categories</div>
+        <ul id="cat-list" style="list-style:none;padding:0;font-family:sans-serif;font-size:13px;">
+          <li><div class="spinner" style="width:20px;height:20px;border-width:2px;margin:10px auto;"></div></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="footer-logo">the<span style="color:#fff">sun</span></div>
+        <p>The Sun is Malaysia's award-winning daily newspaper, delivering the latest news in politics, business, sport, entertainment and more.</p>
+        <p><i class="fa fa-globe mr-1"></i> thesun.my</p>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="footer-title">Quick Links</div>
+        <ul style="list-style:none;padding:0;font-family:sans-serif;font-size:13px;" id="footer-cats"></ul>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="footer-title">Follow Us</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="#" style="background:var(--red);color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:3px;"><i class="fa fa-facebook"></i></a>
+          <a href="#" style="background:var(--red);color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:3px;"><i class="fa fa-twitter"></i></a>
+          <a href="#" style="background:var(--red);color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:3px;"><i class="fa fa-instagram"></i></a>
+          <a href="#" style="background:var(--red);color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:3px;"><i class="fa fa-youtube-play"></i></a>
+        </div>
+        <p style="margin-top:16px;font-size:12px;">Subscribe to our newsletter for daily updates.</p>
+        <div class="input-group input-group-sm mt-2">
+          <input type="email" class="form-control" placeholder="Your email…">
+          <div class="input-group-append">
+            <button class="btn btn-danger btn-sm">Subscribe</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<div class="copyright-bar">
+  &copy; <span id="copy-year"></span> The Sun Media Group. Powered by The Sun WP REST API.
+</div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const API = 'https://thesun.my/wp-json/wp/v2';
+  const PLACEHOLDER = 'https://via.placeholder.com/600x400/1a1a2e/ffffff?text=The+Sun';
+
+  let currentCatId = 'all';
+  let currentPage  = 1;
+  let currentLabel = 'Latest News';
+  let mediaCache   = {};
+  let catCache     = {};
+  let totalPages   = 1;
+
+  /* ── UTILS ── */
+  function fmtDate(str) {
+    const d = new Date(str);
+    return d.toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' });
+  }
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || '';
+  }
+  function truncate(str, n) {
+    str = stripHtml(str);
+    return str.length > n ? str.slice(0, n).trim() + '…' : str;
+  }
+
+  /* ── MEDIA FETCH ── */
+  async function getMediaUrl(id) {
+    if (!id) return null;
+    if (mediaCache[id]) return mediaCache[id];
+    try {
+      const r = await fetch(`${API}/media/${id}`);
+      if (!r.ok) return null;
+      const d = await r.json();
+      const url = (d.media_details && d.media_details.sizes && d.media_details.sizes.medium)
+        ? d.media_details.sizes.medium.source_url
+        : d.source_url;
+      mediaCache[id] = url;
+      return url;
+    } catch { return null; }
+  }
+
+  /* ── RENDER HERO ── */
+  async function renderHero(post) {
+    const imgUrl = await getMediaUrl(post.featured_media) || PLACEHOLDER;
+    const catName = post.categories && post.categories[0] && catCache[post.categories[0]]
+      ? catCache[post.categories[0]] : 'News';
+    document.getElementById('hero-area').innerHTML = `
+      <a href="${post.link}" target="_blank">
+        <div class="hero-post">
+          <img src="${imgUrl}" alt="${stripHtml(post.title.rendered)}" onerror="this.src='${PLACEHOLDER}'">
+          <div class="hero-overlay">
+            <span class="cat-badge">${catName}</span>
+            <h2>${stripHtml(post.title.rendered)}</h2>
+            <div class="meta"><i class="fa fa-clock-o mr-1"></i>${fmtDate(post.date)}</div>
+          </div>
+        </div>
+      </a>`;
+  }
+
+  /* ── RENDER POSTS GRID ── */
+  async function renderPosts(posts, append = false) {
+    const grid = document.getElementById('posts-grid');
+    if (!append) grid.innerHTML = '';
+
+    for (const post of posts) {
+      const imgUrl = await getMediaUrl(post.featured_media);
+      const catName = post.categories && post.categories[0] && catCache[post.categories[0]]
+        ? catCache[post.categories[0]] : '';
+      const col = document.createElement('div');
+      col.className = 'col-md-4';
+      col.innerHTML = `
+        <div class="post-card">
+          <a href="${post.link}" target="_blank">
+            <div class="thumb">
+              ${imgUrl
+                ? `<img src="${imgUrl}" alt="${truncate(post.title.rendered,60)}" onerror="this.src='${PLACEHOLDER}'">`
+                : `<div class="no-img"><i class="fa fa-newspaper-o"></i></div>`}
+            </div>
+          </a>
+          ${catName ? `<span class="cat-label">${catName}</span>` : ''}
+          <h3><a href="${post.link}" target="_blank">${truncate(post.title.rendered, 80)}</a></h3>
+          <div class="meta"><i class="fa fa-clock-o mr-1"></i>${fmtDate(post.date)}</div>
+        </div>`;
+      grid.appendChild(col);
+    }
+  }
+
+  /* ── LOAD CATEGORY POSTS ── */
+  async function fetchPosts(catId, page) {
+    let url = `${API}/posts?per_page=9&page=${page}&_embed=false`;
+    if (catId !== 'all') url += `&categories=${catId}`;
+    const resp = await fetch(url);
+    totalPages = parseInt(resp.headers.get('X-WP-TotalPages') || '1');
+    return resp.json();
+  }
+
+  async function loadCategory(e, catId, label) {
+    if (e) { e.preventDefault(); }
+    currentCatId  = catId;
+    currentPage   = 1;
+    currentLabel  = label;
+
+    // update nav active
+    document.querySelectorAll('.nav-tabs-list a').forEach(a => a.classList.remove('active'));
+    if (e && e.currentTarget) e.currentTarget.classList.add('active');
+
+    document.getElementById('section-label').textContent = label;
+    document.getElementById('hero-area').innerHTML = '<div class="loader-wrap"><div class="spinner"></div><span>Loading…</span></div>';
+    document.getElementById('posts-grid').innerHTML = '<div class="col-12 loader-wrap"><div class="spinner"></div><span>Fetching posts…</span></div>';
+    document.getElementById('load-more-btn').style.display = 'none';
+
+    try {
+      const posts = await fetchPosts(catId, 1);
+      if (!posts.length) {
+        document.getElementById('hero-area').innerHTML = '';
+        document.getElementById('posts-grid').innerHTML = '<div class="col-12 text-center py-4" style="color:#999;font-family:sans-serif;">No posts found.</div>';
+        return;
+      }
+      await renderHero(posts[0]);
+      await renderPosts(posts.slice(1));
+      document.getElementById('load-more-btn').style.display = totalPages > 1 ? 'block' : 'none';
+    } catch(err) {
+      document.getElementById('hero-area').innerHTML = '';
+      document.getElementById('posts-grid').innerHTML = `<div class="col-12 text-center py-4" style="color:#c00;font-family:sans-serif;"><i class="fa fa-exclamation-triangle mr-2"></i>Could not load posts. ${err.message}</div>`;
+    }
+  }
+
+  /* ── LOAD MORE ── */
+  async function loadMore() {
+    const btn = document.getElementById('load-more-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> Loading…';
+    currentPage++;
+    try {
+      const posts = await fetchPosts(currentCatId, currentPage);
+      await renderPosts(posts, true);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-refresh mr-2"></i> Load More';
+      if (currentPage >= totalPages) btn.style.display = 'none';
+    } catch {
+      currentPage--;
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-refresh mr-2"></i> Load More';
+    }
+  }
+
+  /* ── SEARCH ── */
+  async function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+
+    document.querySelectorAll('.nav-tabs-list a').forEach(a => a.classList.remove('active'));
+    currentCatId = 'all';
+    currentLabel = `Search: "${q}"`;
+    document.getElementById('section-label').textContent = currentLabel;
+    document.getElementById('hero-area').innerHTML = '';
+    document.getElementById('posts-grid').innerHTML = '<div class="col-12 loader-wrap"><div class="spinner"></div><span>Searching…</span></div>';
+    document.getElementById('load-more-btn').style.display = 'none';
+
+    try {
+      const resp = await fetch(`${API}/posts?search=${encodeURIComponent(q)}&per_page=9`);
+      const posts = await resp.json();
+      if (!posts.length) {
+        document.getElementById('posts-grid').innerHTML = '<div class="col-12 text-center py-4" style="color:#999;font-family:sans-serif;">No results found.</div>';
+        return;
+      }
+      await renderPosts(posts);
+    } catch(err) {
+      document.getElementById('posts-grid').innerHTML = `<div class="col-12 text-center py-4" style="color:#c00;font-family:sans-serif;">Search failed. ${err.message}</div>`;
+    }
+  }
+  document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  /* ── LOAD CATEGORIES ── */
+  async function loadCategories() {
+    try {
+      const resp = await fetch(`${API}/categories?per_page=20&orderby=count&order=desc&hide_empty=true`);
+      const cats = await resp.json();
+
+      // build catCache
+      cats.forEach(c => { catCache[c.id] = c.name; });
+
+      // populate nav
+      const nav = document.getElementById('cat-nav');
+      cats.slice(0, 8).forEach(cat => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#" data-cat-id="${cat.id}" onclick="loadCategory(event,${cat.id},'${cat.name.replace(/'/g,"\\'")}')">
+          ${cat.name} <span class="badge-count">${cat.count > 99 ? '99+' : cat.count}</span>
+        </a>`;
+        nav.appendChild(li);
+      });
+
+      // sidebar cat list
+      const catList = document.getElementById('cat-list');
+      catList.innerHTML = cats.map(c => `
+        <li style="border-bottom:1px solid #eee;padding:7px 0;display:flex;justify-content:space-between;align-items:center;">
+          <a href="#" onclick="loadCategory(event,${c.id},'${c.name.replace(/'/g,"\\'")}');return false;" style="font-family:sans-serif;">
+            <i class="fa fa-angle-right mr-2" style="color:var(--red);"></i>${c.name}
+          </a>
+          <span style="background:#eee;font-size:11px;padding:1px 6px;border-radius:10px;font-family:sans-serif;">${c.count}</span>
+        </li>`).join('');
+
+      // footer cats
+      document.getElementById('footer-cats').innerHTML = cats.slice(0, 8).map(c =>
+        `<li style="padding:4px 0;border-bottom:1px solid #333;">
+          <a href="#" onclick="loadCategory(event,${c.id},'${c.name.replace(/'/g,"\\'")}');return false;" style="color:#bbb;font-family:sans-serif;">
+            <i class="fa fa-angle-right mr-1" style="color:var(--red);"></i>${c.name}
+          </a>
+        </li>`).join('');
+
+    } catch(err) {
+      console.warn('Categories failed:', err);
+    }
+  }
+
+  /* ── MOST READ SIDEBAR ── */
+  async function loadMostRead() {
+    try {
+      const resp = await fetch(`${API}/posts?per_page=5&orderby=date&order=desc`);
+      const posts = await resp.json();
+      const container = document.getElementById('most-read');
+      container.innerHTML = '';
+      for (const post of posts) {
+        const imgUrl = await getMediaUrl(post.featured_media);
+        const div = document.createElement('div');
+        div.className = 'list-post';
+        div.innerHTML = `
+          <div class="thumb">
+            <a href="${post.link}" target="_blank">
+              <img src="${imgUrl || PLACEHOLDER}" alt="${truncate(post.title.rendered,40)}" onerror="this.src='${PLACEHOLDER}'">
+            </a>
+          </div>
+          <div class="info">
+            <h4><a href="${post.link}" target="_blank">${truncate(post.title.rendered, 70)}</a></h4>
+            <div class="meta"><i class="fa fa-clock-o mr-1"></i>${fmtDate(post.date)}</div>
+          </div>`;
+        container.appendChild(div);
+      }
+    } catch(err) {
+      document.getElementById('most-read').innerHTML = '<p style="font-family:sans-serif;font-size:13px;color:#999;">Could not load.</p>';
+    }
+  }
+
+  /* ── TICKER ── */
+  async function loadTicker() {
+    try {
+      const resp = await fetch(`${API}/posts?per_page=10&orderby=date&order=desc`);
+      const posts = await resp.json();
+      const items = posts.map(p => stripHtml(p.title.rendered));
+      const combined = [...items, ...items]; // duplicate for seamless loop
+      document.getElementById('ticker-track').innerHTML = combined.map(t =>
+        `<span><i class="fa fa-circle" style="font-size:6px;vertical-align:middle;color:var(--red);margin-right:8px;"></i>${t}</span>`
+      ).join('');
+    } catch {}
+  }
+
+  /* ── INIT ── */
+  (async function init() {
+    // date
+    document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    document.getElementById('copy-year').textContent = new Date().getFullYear();
+
+    await loadCategories();
+    await Promise.all([
+      loadCategory(null, 'all', 'Latest News'),
+      loadMostRead(),
+      loadTicker()
+    ]);
+  })();
+</script>
+
+</body>
+</html>
